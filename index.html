@@ -6,17 +6,17 @@
     <title>The Source</title>
     <style>
         :root {
-            --bg-color: #0b0c10;
-            --card-bg: #1f2833;
-            --gold: #c5a059;
-            --text-main: #f5f5f5;
-            --text-muted: #c5a05988;
+            --bg-color: #050b14;      /* Very dark starry midnight background */
+            --card-bg: #0d1b2a;       /* Elegant deep Navy Blue for the text box */
+            --gold: #d4af37;          /* Classic Radiant Metallic Gold */
+            --text-main: #f5f7fa;     /* Crisp soft white for beautiful text contrast */
+            --text-muted: #d4af37aa;  /* Muted gold for the signature */
         }
         
         body {
             background-color: var(--bg-color);
             color: var(--text-main);
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            font-family: 'Times New Roman', Times, serif; /* Changed to Times New Roman */
             display: flex;
             align-items: center;
             justify-content: center;
@@ -24,6 +24,22 @@
             margin: 0;
             padding: 24px;
             box-sizing: border-box;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* Gold Outline around the entire browser window edge */
+        body::after {
+            content: '';
+            position: fixed;
+            top: 12px;
+            left: 12px;
+            right: 12px;
+            bottom: 12px;
+            border: 2px solid var(--gold);
+            border-radius: 12px;
+            pointer-events: none;
+            z-index: 10;
         }
 
         .container {
@@ -32,6 +48,7 @@
             opacity: 0;
             transform: translateY(15px);
             animation: slideUp 1s cubic-bezier(0.1, 1, 0.1, 1) forwards;
+            z-index: 5;
         }
 
         @keyframes slideUp {
@@ -41,82 +58,70 @@
             }
         }
 
-        /* Sleek Photo Container */
-        .photo-frame {
-            background: var(--card-bg);
-            padding: 12px;
-            border-radius: 16px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.5);
-            margin-bottom: 24px;
-            border: 1px solid #ffffff10;
-        }
-
-        .photo-frame img {
-            width: 100%;
-            height: auto;
-            border-radius: 12px;
-            display: block;
-        }
-
-        /* The Content Block */
+        /* The Content Block (Navy Blue with Gold Borders) */
         .content-box {
             background: var(--card-bg);
-        
-        }
-
-        .content-box::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 4px;
-            background: linear-gradient(90deg, var(--gold), transparent);
+            padding: 32px;
+            border-radius: 16px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.6);
+            border: 2px solid var(--gold); /* Distinct gold outline for the content box */
+            position: relative;
+            overflow: hidden;
         }
 
         h1 {
             color: var(--gold);
-            font-size: 24px;
+            font-size: 26px;
             margin-top: 0;
             margin-bottom: 20px;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            font-weight: 700;
+            letter-spacing: 1px;
+            font-weight: bold;
+            border-bottom: 1px solid var(--text-muted);
+            padding-bottom: 10px;
         }
 
         p {
-            font-size: 16px;
-            line-height: 1.7;
-            color: #e0e0e0;
+            font-size: 18px; /* Slightly bumped up size for beautiful serif readability */
+            line-height: 1.8;
+            color: var(--text-main);
             margin-bottom: 18px;
         }
 
         .highlight {
             color: var(--gold);
-            font-weight: 600;
+            font-weight: bold;
         }
 
         .sign-off {
             margin-top: 30px;
-            font-size: 14px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            color: var(--text-muted);
+            font-size: 16px;
+            font-style: italic;
+            color: var(--gold);
             text-align: right;
+        }
+
+        /* Glitter Canvas styles */
+        #glitter-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 99;
         }
     </style>
 </head>
 <body>
 
+    <!-- Canvas overlay specifically for the falling gold glitter -->
+    <canvas id="glitter-canvas"></canvas>
+
     <div class="container">
-        <!-- Photo - Swap this out with your link! -->
-        <div class="photo-frame">
-            <img src="https://unsplash.com" alt="Memory">
-        </div>
 
         <!-- The Letter -->
         <div class="content-box">
-            <h1>My Sunshine,</h1>
+            <h1>Dear Yasar, my sunshine,</h1>
             <p>I stitched the sun onto the front of this hoop for a very specific reason. To me, <span class="highlight">that is exactly who you are</span>.</p>
             
             <p>No matter how cold, chaotic, or stressful the rest of the world gets, the second I am around you, everything just settles down. You have this incredible, natural ability to bring light and massive energy into my life just by being yourself.</p>
@@ -125,9 +130,108 @@
             
             <p>Keep this somewhere close to remind you of the impact you have on me every single day.</p>
             
-            <div class="sign-off">Always in your corner, Alyshah </div>
+            <div class="sign-off">Yours forever and always, Alyshah. </div>
         </div>
+
     </div>
 
+    <!-- Script to trigger the 8-second falling golden glitter -->
+    <script>
+        const canvas = document.getElementById('glitter-canvas');
+        const ctx = canvas.getContext('2d');
+
+        let width = canvas.width = window.innerWidth;
+        let height = canvas.height = window.innerHeight;
+
+        window.addEventListener('resize', () => {
+            width = canvas.width = window.innerWidth;
+            height = canvas.height = window.innerHeight;
+        });
+
+        const numParticles = 80;
+        const particles = [];
+        const goldShades = ['#dfb75c', '#f5e4a3', '#d4af37', '#f3e5ab', '#aa7c11'];
+
+        class GlitterParticle {
+            constructor() {
+                this.x = Math.random() * width;
+                this.y = Math.random() * -height; 
+                this.size = Math.random() * 4 + 2;
+                this.speedY = Math.random() * 2 + 1.5;
+                this.speedX = Math.sin(Math.random() * 2) * 0.5;
+                this.color = goldShades[Math.floor(Math.random() * goldShades.length)];
+                this.opacity = 1;
+                this.rotation = Math.random() * 360;
+                this.rotationSpeed = Math.random() * 2 - 1;
+            }
+
+            update() {
+                this.y += this.speedY;
+                this.x += this.speedX;
+                this.rotation += this.rotationSpeed;
+                
+                // Keep looping top-to-bottom within the active time window
+                if (this.y > height) {
+                    this.y = Math.random() * -50;
+                    this.x = Math.random() * width;
+                }
+            }
+
+            draw() {
+                ctx.save();
+                ctx.translate(this.x, this.y);
+                ctx.rotate(this.rotation * Math.PI / 180);
+                ctx.globalAlpha = this.opacity;
+                ctx.fillStyle = this.color;
+                
+                // Draw tiny diamond-shaped sparkles
+                ctx.beginPath();
+                ctx.moveTo(0, -this.size);
+                ctx.lineTo(this.size/1.5, 0);
+                ctx.lineTo(0, this.size);
+                ctx.lineTo(-this.size/1.5, 0);
+                ctx.closePath();
+                ctx.fill();
+                
+                ctx.restore();
+            }
+        }
+
+        // Initialize particles
+        for (let i = 0; i < numParticles; i++) {
+            particles.push(new GlitterParticle());
+        }
+
+        let animationFrameId;
+        function animate() {
+            ctx.clearRect(0, 0, width, height);
+            particles.forEach(p => {
+                p.update();
+                p.draw();
+            });
+            animationFrameId = requestAnimationFrame(animate);
+        }
+
+        // Start animation immediately
+        animate();
+
+        // Fade out completely and clear memory after exactly 8 seconds
+        setTimeout(() => {
+            let fadeInterval = setInterval(() => {
+                let active = false;
+                particles.forEach(p => {
+                    if (p.opacity > 0) {
+                        p.opacity -= 0.05;
+                        active = true;
+                    }
+                });
+                if (!active) {
+                    clearInterval(fadeInterval);
+                    cancelAnimationFrame(animationFrameId);
+                    ctx.clearRect(0, 0, width, height); // Clean slate
+                }
+            }, 30);
+        }, 8000);
+    </script>
 </body>
 </html>
